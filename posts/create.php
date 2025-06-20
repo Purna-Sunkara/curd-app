@@ -18,15 +18,27 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 }
 ?>
-
-<h2>Create New Post</h2>
-<form method="post" action="">
-    <label>Title:</label><br>
-    <input type="text" name="title" required><br><br>
-
-    <label>Content:</label><br>
-    <textarea name="content" rows="6" cols="40" required></textarea><br><br>
-
-    <input type="submit" value="Add Post">
-</form>
-<a href="../index.php">← Back to Home</a>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Create Post</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+</head>
+<body>
+<div class="container mt-5">
+    <h2>Create New Post</h2>
+    <form method="post" action="">
+        <div class="mb-3">
+            <label class="form-label">Title:</label>
+            <input type="text" name="title" class="form-control" required>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Content:</label>
+            <textarea name="content" class="form-control" rows="6" required></textarea>
+        </div>
+        <button type="submit" class="btn btn-success">Add Post</button>
+        <a href="../index.php" class="btn btn-secondary">← Back to Home</a>
+    </form>
+</div>
+</body>
+</html>
