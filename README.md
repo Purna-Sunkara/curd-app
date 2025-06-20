@@ -1,71 +1,81 @@
-# PHP CRUD Web App with User Authentication
+# PHP MySQL CRUD Application
 
-A simple blog-style web application built with PHP and MySQL that supports full CRUD operations (Create, Read, Update, Delete) and basic user authentication.
+A simple blog CRUD (Create, Read, Update, Delete) application built with PHP and MySQL.
 
-## 🚀 Features
+## Features
 
-- User registration and login with password hashing
-- Session-based authentication (login/logout)
-- Create new blog posts
-- Read/display all posts on the home page
-- Update existing posts
-- Delete posts (only by the post creator)
-- GitHub version control with a clean folder structure
+- User authentication (register, login, logout)
+- Create, read, update, and delete blog posts
+- Search posts by title or content
+- Pagination for posts listing
+- Responsive UI with Bootstrap
+- Custom styles via `assests/style.css`
 
-## 🧱 Folder Structure
+## Folder Structure
 
+```
 crud-app/
-├── index.php ← Displays all blog posts
-├── config/
-│ └── db.php ← MySQL connection setup
+│
+├── assests/
+│   └── style.css
 ├── auth/
-│ ├── login.php ← User login form
-│ └── register.php ← User registration form
+│   ├── login.php
+│   ├── logout.php
+│   └── register.php
+├── config/
+│   └── db.php
 ├── posts/
-│ ├── create.php ← Create new post
-│ ├── update.php ← Edit existing post
-│ └── delete.php ← Delete a post
+│   ├── create.php
+│   ├── delete.php
+│   └── update.php
+├── index.php
 └── README.md
+```
 
+## Setup Instructions
 
-## 🛠️ Technologies Used
+1. **Clone the repository:**
+   ```sh
+   git clone https://github.com/Purna-Sunkara/crud-app.git
+   cd crud-app
+   ```
 
-- PHP (Procedural)
-- MySQL
-- HTML/CSS
-- Apache (via XAMPP)
-- Git & GitHub for version control
+2. **Create the database:**
+   - Open [http://localhost/phpmyadmin](http://localhost/phpmyadmin)
+   - Create a database named `blog` (or update `config/db.php` with your DB name).
 
-## ⚙️ How to Run Locally
+3. **Create tables:**
+   - In phpMyAdmin, run the following SQL to create the required tables:
+     ```sql
+     CREATE TABLE users (
+       id INT AUTO_INCREMENT PRIMARY KEY,
+       username VARCHAR(255) NOT NULL UNIQUE,
+       password VARCHAR(255) NOT NULL
+     );
 
-1. Install [XAMPP](https://www.apachefriends.org/)
-2. Start Apache & MySQL from the XAMPP Control Panel
-3. Navigate to http://localhost/phpmyadmin/
-4. Create a new database named `blog`
-5. Create two tables:
+     CREATE TABLE posts (
+       id INT AUTO_INCREMENT PRIMARY KEY,
+       title VARCHAR(255) NOT NULL,
+       content TEXT NOT NULL
+     );
+     ```
 
-```sql
--- Users Table
-CREATE TABLE users (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  username VARCHAR(50) NOT NULL UNIQUE,
-  password VARCHAR(255) NOT NULL
-);
+4. **Configure database connection:**
+   - Edit `config/db.php` with your local database credentials.
 
--- Posts Table
-CREATE TABLE posts (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  user_id INT NOT NULL,
-  title VARCHAR(255) NOT NULL,
-  content TEXT NOT NULL,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (user_id) REFERENCES users(id)
-);
+5. **Run the app:**
+   - Place the project in your XAMPP `htdocs` folder.
+   - Visit [http://localhost/crud-app](http://localhost/crud-app) in your browser.
 
-github 
-git init
-git add .
-git commit -m "Initial commit - PHP CRUD App"
-git branch -M main
-git remote add origin https://github.com/yourusername/your-repo.git
-git push -u origin main
+## Custom Styles
+
+- You can add or modify styles in `assests/style.css`.
+- The app also uses Bootstrap for responsive design.
+
+## License
+
+This project is for educational purposes.
+
+---
+
+**Made with ❤️ by [Purna Sunkara](https://github.com/Purna-Sunkara)**
