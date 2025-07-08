@@ -1,10 +1,20 @@
 <?php
+require_once 'config/db.php';
+
 session_start();
 if (!isset($_SESSION['user_id'])) {
     header("Location: auth/login.php");
     exit();
 }
-require_once 'config/db.php';
+
+// --- Delete Post ---
+if (isset($_GET['delete_id'])) {
+    $id = intval($_GET['delete_id']);
+    $stmt = $conn->prepare("DELETE FROM posts WHERE id = ?");
+    $stmt->bind_param("i", $id);
+    $stmt->execute();
+    $stmt->close();
+}
 
 // --- Search ---
 $search = isset($_GET['search']) ? trim($_GET['search']) : '';
@@ -82,7 +92,7 @@ $result = $stmt->get_result();
                     <h5><?= htmlspecialchars($row['title']) ?></h5>
                     <p><?= nl2br(htmlspecialchars($row['content'])) ?></p>
                     <a href="posts/update.php?id=<?= $row['id'] ?>" class="btn btn-sm btn-warning">Edit</a>
-                    <a href="posts/delete.php?id=<?= $row['id'] ?>" class="btn btn-sm btn-danger" onclick="return confirm('Delete this post?')">Delete</a>
+                    <a href="index.php?delete_id=<?= $row['id'] ?>" class="btn btn-sm btn-danger" onclick="return confirm('Delete this post?')">Delete</a>
                 </li>
             <?php endwhile; ?>
         </ul>

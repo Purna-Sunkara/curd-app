@@ -1,12 +1,15 @@
 <?php
 session_start();
-if (!isset($_SESSION['user_id'])) {
-    header("Location: ../auth/login.php"); // or "auth/login.php" for index.php
-    exit();
+if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
+    die("Access denied.");
 }
 
 include('../config/db.php');
-$id = $_GET['id'];
-mysqli_query($conn, "DELETE FROM posts WHERE id=$id");
+$title = $_POST['title'];
+$content = $_POST['content'];
+$stmt = $conn->prepare("INSERT INTO posts (title, content) VALUES (?, ?)");
+$stmt->bind_param("ss", $title, $content);
+$stmt->execute();
+$stmt->close();
 header("Location: ../index.php");
 ?>

@@ -1,20 +1,34 @@
 <?php
 session_start();
-if (!isset($_SESSION['user_id'])) {
-    header("Location: ../auth/login.php");
-    exit();
+if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
+    die("Access denied.");
 }
 
 include('../config/db.php');
-$id = $_GET['id'];
-$result = mysqli_query($conn, "SELECT * FROM posts WHERE id=$id");
-$post = mysqli_fetch_assoc($result);
+
+// Validate and sanitize the id
+$id = isset($_GET['id']) ? intval($_GET['id']) : 0;
+
+// Use prepared statement to fetch the post
+$stmt = $conn->prepare("SELECT * FROM posts WHERE id = ?");
+$stmt->bind_param("i", $id);
+$stmt->execute();
+$result = $stmt->get_result();
+$post = $result->fetch_assoc();
+$stmt->close();
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $title = $_POST['title'];
-    $content = $_POST['content'];
-    mysqli_query($conn, "UPDATE posts SET title='$title', content='$content' WHERE id=$id");
+    $title = trim($_POST['title']);
+    $content = trim($_POST['content']);
+
+    // Prepared statement for update
+    $stmt = $conn->prepare("UPDATE posts SET title = ?, content = ? WHERE id = ?");
+    $stmt->bind_param("ssi", $title, $content, $id);
+    $stmt->execute();
+    $stmt->close();
+
     header("Location: ../index.php");
+    exit;
 }
 ?>
 <!DOCTYPE html>

@@ -7,15 +7,34 @@ if (!isset($_SESSION['user_id'])) {
 include('../config/db.php');
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $title = mysqli_real_escape_string($conn, $_POST['title']);
-    $content = mysqli_real_escape_string($conn, $_POST['content']);
+    $title = trim($_POST['title']);
+    $content = trim($_POST['content']);
+    $errors = [];
 
-    $query = "INSERT INTO posts (title, content) VALUES ('$title', '$content')";
-    if (mysqli_query($conn, $query)) {
-        header("Location: ../index.php");
-    } else {
-        echo "Error: " . mysqli_error($conn);
+    if (empty($title)) $errors[] = "Title is required.";
+    if (strlen($title) > 255) $errors[] = "Title must be less than 255 characters.";
+    if (empty($content)) $errors[] = "Content is required.";
+
+    if (empty($errors)) {
+        $title = mysqli_real_escape_string($conn, $title);
+        $content = mysqli_real_escape_string($conn, $content);
+
+        $query = "INSERT INTO posts (title, content) VALUES ('$title', '$content')";
+        if (mysqli_query($conn, $query)) {
+            header("Location: ../index.php");
+        } else {
+            echo "Error: " . mysqli_error($conn);
+        }
     }
+}
+
+// Code change: Prepared statement for deleting a post
+if (isset($_GET['delete_id'])) {
+    $id = $_GET['delete_id'];
+    $stmt = $conn->prepare("DELETE FROM posts WHERE id = ?");
+    $stmt->bind_param("i", $id);
+    $stmt->execute();
+    $stmt->close();
 }
 ?>
 <!DOCTYPE html>

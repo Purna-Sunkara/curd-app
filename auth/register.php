@@ -2,19 +2,42 @@
 session_start();
 require_once '../config/db.php';
 
+$errors = [];
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $username = trim($_POST['username']);
-    $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
+    $password = $_POST['password'];
+    $role = 'user'; // default role
 
-    $stmt = $conn->prepare("INSERT INTO users (username, password) VALUES (?, ?)");
-    $stmt->bind_param("ss", $username, $password);
+    // Server-side validation
+    if (empty($username)) {
+        $errors[] = "Username is required.";
+    }
 
-    if ($stmt->execute()) {
-        $success = "Registration successful. <a href='login.php'>Login now</a>";
-    } else {
-        $error = "Error: " . $stmt->error;
+    if (strlen($password) < 6) {
+        $errors[] = "Password must be at least 6 characters.";
+    }
+
+    // Only proceed if no errors
+    if (empty($errors)) {
+        $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+
+        $stmt = $conn->prepare("INSERT INTO users (username, password, role) VALUES (?, ?, ?)");
+        $stmt->bind_param("sss", $username, $hashed_password, $role);
+
+        if ($stmt->execute()) {
+            $success = "Registration successful. <a href='login.php'>Login now</a>";
+        } else {
+            $error = "Error: " . $stmt->error;
+        }
     }
 }
+
+// Example of the suggested code change applied to a DELETE operation
+$id = 1; // This should be set to the id you want to delete
+$stmt = $conn->prepare("DELETE FROM posts WHERE id = ?");
+$stmt->bind_param("i", $id);
+$stmt->execute();
 ?>
 <!DOCTYPE html>
 <html>
@@ -29,6 +52,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <div class="alert alert-success"><?= $success ?></div>
     <?php elseif (!empty($error)): ?>
         <div class="alert alert-danger"><?= htmlspecialchars($error) ?></div>
+    <?php endif; ?>
+    <?php if (!empty($errors)): ?>
+        <div class="alert alert-danger">
+            <ul>
+                <?php foreach ($errors as $err): ?>
+                    <li><?= htmlspecialchars($err) ?></li>
+                <?php endforeach; ?>
+            </ul>
+        </div>
     <?php endif; ?>
     <form method="POST" action="">
         <div class="mb-3">

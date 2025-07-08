@@ -2,31 +2,40 @@
 session_start();
 require_once '../config/db.php';
 
+// Server-side validation
+$errors = [];
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $username = trim($_POST['username']);
-    $password = trim($_POST['password']);
+    if (empty($_POST['username'])) $errors[] = "Username is required.";
+    if (empty($_POST['password']) || strlen($_POST['password']) < 6) $errors[] = "Password must be at least 6 characters.";
 
-    $stmt = $conn->prepare("SELECT * FROM users WHERE username = ?");
-    $stmt->bind_param("s", $username);
-    $stmt->execute();
-    $result = $stmt->get_result();
+    // Only proceed if no errors
+    if (empty($errors)) {
+        $username = trim($_POST['username']);
+        $password = trim($_POST['password']);
 
-    if ($result->num_rows === 1) {
-        $row = $result->fetch_assoc();
+        $stmt = $conn->prepare("SELECT * FROM users WHERE username = ?");
+        $stmt->bind_param("s", $username);
+        $stmt->execute();
+        $result = $stmt->get_result();
 
-        if (password_verify($password, $row['password'])) {
-            $_SESSION['user_id'] = $row['id'];
-            $_SESSION['username'] = $row['username'];
-            header("Location: ../index.php");
-            exit;
+        if ($result->num_rows === 1) {
+            $row = $result->fetch_assoc();
+
+            if (password_verify($password, $row['password'])) {
+                $_SESSION['user_id'] = $row['id'];
+                $_SESSION['username'] = $row['username'];
+                $_SESSION['role'] = $row['role']; // Add this line
+                header("Location: ../index.php");
+                exit;
+            } else {
+                $error = "Invalid credentials!";
+            }
         } else {
             $error = "Invalid credentials!";
         }
-    } else {
-        $error = "Invalid credentials!";
-    }
 
-    $stmt->close();
+        $stmt->close();
+    }
 }
 ?>
 <!DOCTYPE html>
